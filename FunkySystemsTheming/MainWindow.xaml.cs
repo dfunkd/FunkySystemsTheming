@@ -1,24 +1,30 @@
-﻿using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace FunkySystemsTheming
+namespace FunkySystemsTheming;
+
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    #region Routed Commands
+    #region Close Command
+    private static readonly RoutedCommand closeCommand = new();
+    public static RoutedCommand CloseCommand = closeCommand;
+    private void CanExecuteCloseCommand(object sender, CanExecuteRoutedEventArgs e)
+        => e.CanExecute = e.Source is Control;
+    private void ExecutedCloseCommand(object sender, ExecutedRoutedEventArgs e)
+        => Close();
+    #endregion
+    #endregion
+
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
+
+    private void OnDrag(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+            DragMove();
     }
 }
