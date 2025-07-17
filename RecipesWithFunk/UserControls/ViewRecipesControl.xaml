@@ -1,13 +1,148 @@
 ﻿<UserControl x:Class="RecipesWithFunk.UserControls.ViewRecipesControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:filter="clr-namespace:RecipesWithFunk.Core.Filter"
              xmlns:local="clr-namespace:RecipesWithFunk.UserControls"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:RecipesWithFunk.ViewModels"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="OnLoaded">
+
+    <UserControl.CommandBindings>
+        <CommandBinding Command="{x:Static local:ViewRecipesControl.AddCommand}" CanExecute="CanExecuteAddCommand" Executed="ExecutedAddCommand" />
+        <CommandBinding Command="{x:Static local:ViewRecipesControl.CancelCommand}" CanExecute="CanExecuteCancelCommand" Executed="ExecutedCancelCommand" />
+        <CommandBinding Command="{x:Static local:ViewRecipesControl.DeleteRecipeCommand}" CanExecute="CanExecuteDeleteRecipeCommand" Executed="ExecutedDeleteRecipeCommand" />
+        <CommandBinding Command="{x:Static local:ViewRecipesControl.EditCommand}" CanExecute="CanExecuteEditCommand" Executed="ExecutedEditCommand" />
+        <CommandBinding Command="{x:Static local:ViewRecipesControl.ExportCommand}" CanExecute="CanExecuteExportCommand" Executed="ExecutedExportCommand" />
+        <CommandBinding Command="{x:Static local:ViewRecipesControl.ImportCommand}" CanExecute="CanExecuteImportCommand" Executed="ExecutedImportCommand" />
+    </UserControl.CommandBindings>
+
+    <UserControl.DataContext>
+        <vm:ViewRecipesControlViewModel />
+    </UserControl.DataContext>
     
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Column="0" Grid.Row="0" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10" Background="{DynamicResource Lighter}"
+                HorizontalAlignment="Center" Margin="0">
+            <DockPanel x:Name="wpMenu" LastChildFill="False">
+                <Button x:Name="tbImport" Content="Import" Height="30" Margin="5, 5, 2, 5" Width="90" />
+                <Button x:Name="tbExport" Content="Export" Height="30" Margin="2, 5" Width="90" />
+            </DockPanel>
+        </Border>
+
+        <DockPanel Grid.Column="0" Grid.Row="2" Margin="0, 0 , 0, 20" LastChildFill="True">
+            <Border DockPanel.Dock="Top" Background="{DynamicResource HeaderFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 1, 1, 0"
+                    CornerRadius="5, 5, 0, 0" HorizontalAlignment="Stretch" Margin="5, 0, -1, 0">
+                <DockPanel LastChildFill="True">
+                    <ItemsControl x:Name="icTypes" DockPanel.Dock="Bottom" ItemsSource="{Binding Types}" Margin="5, 0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ToggleButton x:Name="tbTransferred" Grid.Column="0" Grid.Row="0" Click="OnTypeChanged" Height="20" IsChecked="False"
+                                              Style="{DynamicResource FilterToggleStyle}">
+                                    <ToggleButton.Content>
+                                        <TextBlock Text="{Binding}" FontWeight="Bold" FontSize="12" />
+                                    </ToggleButton.Content>
+                                    <ToggleButton.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="5" />
+                                        </Style>
+                                    </ToggleButton.Resources>
+                                </ToggleButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <DockPanel LastChildFill="True">
+                        <TextBlock FontWeight="Bold" Foreground="{DynamicResource Lightest}" Margin="5" Text="Search" TextAlignment="Right" VerticalAlignment="Center"
+                                   Width="50" />
+                        <Button DockPanel.Dock="Right" Height="15" Background="Transparent" Margin="0, 5, 5, 5" Padding="5, 0" Width="25">
+                            <Button.Content>
+                                <TextBlock Text="X" FontWeight="Bold" FontSize="10" />
+                            </Button.Content>
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource Darkest}" />
+                                    <Setter Property="BorderThickness" Value="0, 1, 1, 1" />
+                                    <Setter Property="CornerRadius" Value="0, 5, 5, 0" />
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <TextBox DockPanel.Dock="Left" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" Foreground="{DynamicResource Lightest}"
+                                 Margin="5, 5, 0, 5" Text="{Binding Path=SearchString, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnSearchChanged">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type Border}">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource Darkest}" />
+                                    <Setter Property="BorderThickness" Value="1, 1, 0, 1" />
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                    </DockPanel>
+                </DockPanel>
+            </Border>
+            <Border DockPanel.Dock="Bottom" Background="{DynamicResource Darkest}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 0, 1, 1"
+                    CornerRadius="0, 0, 5, 5" HorizontalAlignment="Stretch" Margin="5, 0, 0, 0" VerticalAlignment="Center">
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Left" Command="local:ViewRecipesControl.AddCommand" FontWeight="Bold" HorizontalAlignment="Left" Margin="20, 3"
+                            VerticalAlignment="Top">
+                        <Button.Content>
+                            <TextBlock Text="Add" />
+                        </Button.Content>
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="5" />
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <TextBlock DockPanel.Dock="Right" Foreground="{DynamicResource Lightest}" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock FontWeight="Bold" Margin="10, 0, 2, 0" Text="Count:" />
+                        <TextBlock Margin="2, 0, 10, 0" Text="{Binding Recipes.Count}" />
+                    </TextBlock>
+                </DockPanel>
+            </Border>
+            <ListView x:Name="lvRecipes" DockPanel.Dock="Top" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" filter:Filter.By="{Binding Filter}"
+                      FontWeight="Bold" Foreground="{DynamicResource Darkest}" HorizontalContentAlignment="Stretch" Margin="5, 0, 0, 0" SelectedItem="{Binding SelectedRecipe}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" FontSize="16" Margin="0, 0, 3, 0" Text="{Binding Name}" />
+                            <TextBlock Grid.Column="1" FontSize="16" Text="{Binding Type, StringFormat={}({0})}" />
+                            <Button Grid.Column="2" Command="local:ViewRecipesControl.DeleteRecipeCommand" HorizontalAlignment="Right" Margin="5, 0" Padding="0, 0, 0, 2"
+                                    Style="{DynamicResource CancelButtonStyle}" Tag="{Binding Path=RecipeId}" Width="30">
+                                <Button.Content>
+                                    <TextBlock FontWeight="Bold" Foreground="{DynamicResource ButtonBrush}" Text="X" />
+                                </Button.Content>
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="5" />
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </DockPanel>
     </Grid>
 </UserControl>

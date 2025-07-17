@@ -1,14 +1,9 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using RecipesWithFunk.Model;
 using System.Windows;
 
-namespace RecipesWithFunk
-{
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
-    {
-    }
+namespace RecipesWithFunk;
 
+public partial class App : Application
+{
+    public Recipe? SelectedRecipe { get; set; }
 }
