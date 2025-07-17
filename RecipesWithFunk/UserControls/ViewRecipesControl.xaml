@@ -95,7 +95,7 @@
                     </DockPanel>
                 </DockPanel>
             </Border>
-            <Border DockPanel.Dock="Bottom" Background="{DynamicResource Darkest}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 0, 1, 1"
+            <Border DockPanel.Dock="Bottom" Background="{DynamicResource ReverseHeaderFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 0, 1, 1"
                     CornerRadius="0, 0, 5, 5" HorizontalAlignment="Stretch" Margin="5, 0, 0, 0" VerticalAlignment="Center">
                 <DockPanel LastChildFill="True">
                     <Button DockPanel.Dock="Left" Command="local:ViewRecipesControl.AddCommand" FontWeight="Bold" HorizontalAlignment="Left" Margin="20, 3"

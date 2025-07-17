@@ -36,9 +36,8 @@
         <GradientStop Color="{DynamicResource DarkerColor}" Offset="1" />
     </LinearGradientBrush>
 
-
     <LinearGradientBrush x:Key="ReverseHeaderFade" StartPoint="0.5, 0" EndPoint="0.5, 1">
-        <GradientStop Color="{DynamicResource DarkestColor}" Offset="0" />
+        <GradientStop Color="{DynamicResource DarkerColor}" Offset="0" />
         <GradientStop Color="{DynamicResource LighterColor}" Offset="1" />
     </LinearGradientBrush>
 
