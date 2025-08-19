@@ -21,9 +21,10 @@
         </Grid.RowDefinitions>
         
         <cc:OutlinedTextBlock Grid.Row="0" FontSize="36" FontWeight="Bold" Fill="{DynamicResource RuanRedFade}" HorizontalAlignment="Center" Margin="0, 0, 0, -5" StrokeThickness="2" Text="{Binding Path=Title}" VerticalAlignment="Center" />
+        
         <cc:OutlinedTextBlock Grid.Row="1" FontSize="36" FontWeight="Bold" Fill="{DynamicResource ReverseRuanRedFade}" HorizontalAlignment="Center" Margin="0, -5, 0, 0" Text="{Binding Path=SubTitle}" VerticalAlignment="Center" />
 
-        <Rectangle Grid.Row="2" RadiusX="5" RadiusY="5" Height="600" Width="425">
+        <Rectangle Grid.Row="2" RadiusX="5" RadiusY="5" Height="750" Width="525">
             <Rectangle.Effect>
                 <DropShadowEffect ShadowDepth="10" Direction="330" Color="{DynamicResource DarkerColor}" Opacity="0.5" BlurRadius="4" />
             </Rectangle.Effect>

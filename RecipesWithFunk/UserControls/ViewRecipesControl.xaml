@@ -1,5 +1,7 @@
 ﻿<UserControl x:Class="RecipesWithFunk.UserControls.ViewRecipesControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:cc="clr-namespace:RecipesWithFunk.CustomControls"
+             xmlns:conv="clr-namespace:RecipesWithFunk.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:filter="clr-namespace:RecipesWithFunk.Core.Filter"
              xmlns:local="clr-namespace:RecipesWithFunk.UserControls"
@@ -20,11 +22,11 @@
     <UserControl.DataContext>
         <vm:ViewRecipesControlViewModel />
     </UserControl.DataContext>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="5*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -33,23 +35,20 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Column="0" Grid.Row="0" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10" Background="{DynamicResource Lighter}"
-                HorizontalAlignment="Center" Margin="0">
+        <Border Grid.Column="0" Grid.Row="0" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10" Background="{DynamicResource Lighter}" HorizontalAlignment="Center" Margin="0">
             <DockPanel x:Name="wpMenu" LastChildFill="False">
-                <Button x:Name="tbImport" Content="Import" Height="30" Margin="5, 5, 2, 5" Width="90" />
-                <Button x:Name="tbExport" Content="Export" Height="30" Margin="2, 5" Width="90" />
+                <Button x:Name="tbImport" Command="local:ViewRecipesControl.ImportCommand" Content="Import" Height="30" Margin="5, 5, 2, 5" Width="90" />
+                <Button x:Name="tbExport" Command="local:ViewRecipesControl.ExportCommand" Content="Export" Height="30" Margin="2, 5" Width="90" />
             </DockPanel>
         </Border>
 
-        <DockPanel Grid.Column="0" Grid.Row="2" Margin="0, 0 , 0, 20" LastChildFill="True">
-            <Border DockPanel.Dock="Top" Background="{DynamicResource HeaderFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 1, 1, 0"
-                    CornerRadius="5, 5, 0, 0" HorizontalAlignment="Stretch" Margin="5, 0, -1, 0">
+        <DockPanel Grid.Column="0" Grid.Row="2" LastChildFill="True">
+            <Border DockPanel.Dock="Top" Background="{DynamicResource HeaderFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 1, 1, 0" CornerRadius="5, 5, 0, 0" HorizontalAlignment="Stretch" Margin="5, 0, -1, 0">
                 <DockPanel LastChildFill="True">
                     <ItemsControl x:Name="icTypes" DockPanel.Dock="Bottom" ItemsSource="{Binding Types}" Margin="5, 0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <ToggleButton x:Name="tbTransferred" Grid.Column="0" Grid.Row="0" Click="OnTypeChanged" Height="20" IsChecked="False"
-                                              Style="{DynamicResource FilterToggleStyle}">
+                                <ToggleButton x:Name="tbTransferred" Grid.Column="0" Grid.Row="0" Click="OnTypeChanged" Height="20" IsChecked="False" Style="{DynamicResource FilterToggleStyle}">
                                     <ToggleButton.Content>
                                         <TextBlock Text="{Binding}" FontWeight="Bold" FontSize="12" />
                                     </ToggleButton.Content>
@@ -69,39 +68,29 @@
                     </ItemsControl>
 
                     <DockPanel LastChildFill="True">
-                        <TextBlock FontWeight="Bold" Foreground="{DynamicResource Lightest}" Margin="5" Text="Search" TextAlignment="Right" VerticalAlignment="Center"
-                                   Width="50" />
-                        <Button DockPanel.Dock="Right" Height="15" Background="Transparent" Margin="0, 5, 5, 5" Padding="5, 0" Width="25">
-                            <Button.Content>
-                                <TextBlock Text="X" FontWeight="Bold" FontSize="10" />
-                            </Button.Content>
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource Darkest}" />
-                                    <Setter Property="BorderThickness" Value="0, 1, 1, 1" />
-                                    <Setter Property="CornerRadius" Value="0, 5, 5, 0" />
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-                        <TextBox DockPanel.Dock="Left" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" Foreground="{DynamicResource Lightest}"
-                                 Margin="5, 5, 0, 5" Text="{Binding Path=SearchString, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnSearchChanged">
-                            <TextBox.Resources>
-                                <Style TargetType="{x:Type Border}">
-                                    <Setter Property="BorderBrush" Value="{DynamicResource Darkest}" />
-                                    <Setter Property="BorderThickness" Value="1, 1, 0, 1" />
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                        <TextBlock FontWeight="Bold" Foreground="{DynamicResource Lightest}" Margin="5" Text="Search" TextAlignment="Right" VerticalAlignment="Center" Width="50" />
+                        <Button DockPanel.Dock="Right" Height="35" Margin="5" Padding="5, 0" Content="X" Width="35" />
+                        <TextBox DockPanel.Dock="Left" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" FontWeight="Bold" Foreground="{DynamicResource Lightest}" Margin="5, 10, 0, 10"
+                                 Text="{Binding Path=SearchString, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnSearchChanged" VerticalContentAlignment="Center" />
                     </DockPanel>
                 </DockPanel>
             </Border>
-            <Border DockPanel.Dock="Bottom" Background="{DynamicResource ReverseHeaderFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 0, 1, 1"
-                    CornerRadius="0, 0, 5, 5" HorizontalAlignment="Stretch" Margin="5, 0, 0, 0" VerticalAlignment="Center">
+            <Border DockPanel.Dock="Bottom" Background="{DynamicResource ReverseHeaderFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1, 0, 1, 1" CornerRadius="0, 0, 5, 5" HorizontalAlignment="Stretch" Margin="5, 0, 0, 0"
+                    VerticalAlignment="Center">
                 <DockPanel LastChildFill="True">
-                    <Button DockPanel.Dock="Left" Command="local:ViewRecipesControl.AddCommand" FontWeight="Bold" HorizontalAlignment="Left" Margin="20, 3"
-                            VerticalAlignment="Top">
+                    <Button DockPanel.Dock="Left" Command="local:ViewRecipesControl.AddCommand" FontWeight="Bold" HorizontalAlignment="Left" Margin="20, 3" VerticalAlignment="Top">
                         <Button.Content>
                             <TextBlock Text="Add" />
+                        </Button.Content>
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="5" />
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button DockPanel.Dock="Left" Command="local:ViewRecipesControl.EditCommand" FontWeight="Bold" HorizontalAlignment="Left" Margin="20, 3" VerticalAlignment="Top">
+                        <Button.Content>
+                            <TextBlock Text="Edit" />
                         </Button.Content>
                         <Button.Resources>
                             <Style TargetType="Border">
@@ -115,8 +104,8 @@
                     </TextBlock>
                 </DockPanel>
             </Border>
-            <ListView x:Name="lvRecipes" DockPanel.Dock="Top" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" filter:Filter.By="{Binding Filter}"
-                      FontWeight="Bold" Foreground="{DynamicResource Darkest}" HorizontalContentAlignment="Stretch" Margin="5, 0, 0, 0" SelectedItem="{Binding SelectedRecipe}">
+            <ListView x:Name="lvRecipes" DockPanel.Dock="Top" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" filter:Filter.By="{Binding Filter}" FontWeight="Bold" Foreground="{DynamicResource Darkest}"
+                      HorizontalContentAlignment="Stretch" Margin="5, 0, 0, 0" SelectedItem="{Binding SelectedRecipe}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -128,10 +117,9 @@
 
                             <TextBlock Grid.Column="0" FontSize="16" Margin="0, 0, 3, 0" Text="{Binding Name}" />
                             <TextBlock Grid.Column="1" FontSize="16" Text="{Binding Type, StringFormat={}({0})}" />
-                            <Button Grid.Column="2" Command="local:ViewRecipesControl.DeleteRecipeCommand" HorizontalAlignment="Right" Margin="5, 0" Padding="0, 0, 0, 2"
-                                    Style="{DynamicResource CancelButtonStyle}" Tag="{Binding Path=RecipeId}" Width="30">
+                            <Button Grid.Column="2" Command="local:ViewRecipesControl.DeleteRecipeCommand" HorizontalAlignment="Right" Margin="5, 0" Padding="0, 0, 0, 2" Style="{DynamicResource CancelButtonStyle}" Tag="{Binding Path=RecipeId}" Width="25">
                                 <Button.Content>
-                                    <TextBlock FontWeight="Bold" Foreground="{DynamicResource ButtonBrush}" Text="X" />
+                                    <TextBlock FontSize="10" FontWeight="Bold" Foreground="{DynamicResource ButtonBrush}" Text="X" />
                                 </Button.Content>
                                 <Button.Resources>
                                     <Style TargetType="Border">
@@ -144,5 +132,93 @@
                 </ListView.ItemTemplate>
             </ListView>
         </DockPanel>
+
+        <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Margin="10, 0, 0, 0" Visibility="{Binding Path=SelectedRecipe, Converter={StaticResource NullToCollapsedConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <conv:RatingConverter x:Key="RatingConverter" OnBrush="{StaticResource RuanRedFade}" OffBrush="{StaticResource HeaderFade}" />
+                <Style TargetType="Rectangle">
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                    <Setter Property="VerticalAlignment" Value="Bottom" />
+                    <Setter Property="Margin" Value="5,0,0,0" />
+                </Style>
+            </Grid.Resources>
+
+            <!--<TextBlock Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource RuanRedFade}" Margin="10, 0" Text="{Binding SelectedRecipe.Name}" />-->
+            <cc:OutlinedTextBlock Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0" FontSize="28" FontWeight="Bold" Fill="{DynamicResource RuanRedFade}" Margin="10, 0" StrokeThickness="1" Text="{Binding SelectedRecipe.Name}" VerticalAlignment="Center" />
+
+            <Border Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" Background="{DynamicResource RuanRedFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10, 10, 10, 10" HorizontalAlignment="Center" Margin="5" Width="300">
+                <TextBlock FontSize="16" Foreground="{DynamicResource ButtonBrush}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock FontWeight="Bold" HorizontalAlignment="Right" Text="Type: " />
+                    <TextBlock FontWeight="Bold" HorizontalAlignment="Left" Margin="0, 0, 10, 0" Text="{Binding SelectedRecipe.Type}" />
+                    <TextBlock FontWeight="Bold" HorizontalAlignment="Right" Margin="10, 0, 0, 0" Text="Servings: " />
+                    <TextBlock FontWeight="Bold" HorizontalAlignment="Left" Text="{Binding SelectedRecipe.Servings}" />
+                </TextBlock>
+            </Border>
+
+            <StackPanel Grid.Column="3" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 5" VerticalAlignment="Center">
+                <Path Data="F1 M 17.416,32.25L 32.910,32.25L 38,18L 43.089,32.25L 58.583,32.25L 45.679,41.494L 51.458,56L 38,48.083L 26.125,56L 30.597,41.710L 17.416,32.25 Z"
+                          Fill="{Binding SelectedRecipe.Rating, Converter={StaticResource RatingConverter}, ConverterParameter=1}" Height="35" Margin="2, 0" Stretch="UniformToFill"
+                          Stroke="{DynamicResource RuanRedFade}" StrokeThickness="1" Width="35" />
+                <Path Data="F1 M 17.416,32.25L 32.910,32.25L 38,18L 43.089,32.25L 58.583,32.25L 45.679,41.494L 51.458,56L 38,48.083L 26.125,56L 30.597,41.710L 17.416,32.25 Z"
+                          Fill="{Binding SelectedRecipe.Rating, Converter={StaticResource RatingConverter}, ConverterParameter=2}" Height="35" Margin="2, 0" Stretch="UniformToFill"
+                          Stroke="{DynamicResource RuanRedFade}" StrokeThickness="1" Width="35" />
+                <Path Data="F1 M 17.416,32.25L 32.910,32.25L 38,18L 43.089,32.25L 58.583,32.25L 45.679,41.494L 51.458,56L 38,48.083L 26.125,56L 30.597,41.710L 17.416,32.25 Z"
+                          Fill="{Binding SelectedRecipe.Rating, Converter={StaticResource RatingConverter}, ConverterParameter=3}" Height="35" Margin="2, 0" Stretch="UniformToFill"
+                          Stroke="{DynamicResource RuanRedFade}" StrokeThickness="1" Width="35" />
+                <Path Data="F1 M 17.416,32.25L 32.910,32.25L 38,18L 43.089,32.25L 58.583,32.25L 45.679,41.494L 51.458,56L 38,48.083L 26.125,56L 30.597,41.710L 17.416,32.25 Z"
+                          Fill="{Binding SelectedRecipe.Rating, Converter={StaticResource RatingConverter}, ConverterParameter=4}" Height="35" Margin="2, 0" Stretch="UniformToFill"
+                          Stroke="{DynamicResource RuanRedFade}" StrokeThickness="1" Width="35" />
+                <Path Data="F1 M 17.416,32.25L 32.910,32.25L 38,18L 43.089,32.25L 58.583,32.25L 45.679,41.494L 51.458,56L 38,48.083L 26.125,56L 30.597,41.710L 17.416,32.25 Z"
+                          Fill="{Binding SelectedRecipe.Rating, Converter={StaticResource RatingConverter}, ConverterParameter=5}" Height="35" Margin="2, 0" Stretch="UniformToFill"
+                          Stroke="{DynamicResource RuanRedFade}" StrokeThickness="1" Width="35" />
+            </StackPanel>
+
+            <Border Grid.Column="0" Grid.Row="1" Background="{DynamicResource RuanRedFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10, 150, 0, 0" Margin="5, 5, 5, 0">
+                <TextBlock FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ButtonBrush}" Margin="15, 5" Text="Description" />
+            </Border>
+            <Border Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="2" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="0, 10, 10, 10" Margin="5, 0, 5, 5">
+                <TextBox Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontSize="14" FontWeight="Bold" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         SpellCheck.IsEnabled="True" Text="{Binding SelectedRecipe.Description}" TextWrapping="Wrap" />
+            </Border>
+
+            <Border Grid.Column="0" Grid.Row="3" Background="{DynamicResource RuanRedFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10, 150, 0, 0" Margin="5, 5, 5, 0">
+                <TextBlock FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ButtonBrush}" Margin="15, 5" Text="Ingredients" />
+            </Border>
+            <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="0, 10, 10, 10" Margin="5, 0, 5, 5">
+                <TextBox Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontSize="14" FontWeight="Bold" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         SpellCheck.IsEnabled="True" Text="{Binding SelectedRecipe.Ingredients}" TextWrapping="Wrap" />
+            </Border>
+
+            <Border Grid.Column="2" Grid.Row="3" Background="{DynamicResource RuanRedFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10, 150, 0, 0" Margin="5, 5, 5, 0">
+                <TextBlock FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ButtonBrush}" Margin="15, 5" Text="Directions" />
+            </Border>
+            <Border Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="4" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="0, 10, 10, 10" Margin="5, 0, 5, 5">
+                <TextBox Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontSize="14" FontWeight="Bold" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         SpellCheck.IsEnabled="True" Text="{Binding SelectedRecipe.Directions}" TextWrapping="Wrap" />
+            </Border>
+
+            <Border Grid.Column="0" Grid.Row="5" Background="{DynamicResource RuanRedFade}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="10, 150, 0, 0" Margin="5, 5, 5, 0">
+                <TextBlock FontSize="16" FontWeight="Bold" Foreground="{DynamicResource ButtonBrush}" Margin="15, 5" Text="Notes" />
+            </Border>
+            <Border Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="6" Background="{DynamicResource Lighter}" BorderBrush="{DynamicResource Darkest}" BorderThickness="1" CornerRadius="0, 10, 10, 10" Margin="5, 0, 5, 5">
+                <TextBox Background="Transparent" BorderBrush="Transparent" BorderThickness="0" FontSize="14" FontWeight="Bold" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         SpellCheck.IsEnabled="True" Text="{Binding SelectedRecipe.Note}" TextWrapping="Wrap" />
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>

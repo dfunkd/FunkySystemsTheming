@@ -1,7 +1,7 @@
 ﻿using Microsoft.Win32;
-using RecipesWithFunk.Data.Services;
 using RecipesWithFunk.Model;
 using RecipesWithFunk.ViewModels;
+using RecipesWithFunk.Windows;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,9 +13,7 @@ namespace RecipesWithFunk.UserControls;
 public partial class ViewRecipesControl : UserControl
 {
     #region Properties
-    private IRecipeService recipeService;
-    private CancellationToken cancellationToken = default;
-    private bool _suspendChangeHandlers = false;
+    private RecipesWithFunkWindow parent = null;
     #endregion
 
     #region Routed Commands
@@ -27,6 +25,7 @@ public partial class ViewRecipesControl : UserControl
     private void ExecutedAddCommand(object sender, ExecutedRoutedEventArgs e)
     {
         ((App)Application.Current).SelectedRecipe = null;
+        parent.ChangeContent(new AddRecipeControl(parent));
     }
     #endregion
 
@@ -55,8 +54,8 @@ public partial class ViewRecipesControl : UserControl
         if (e.OriginalSource is Control ctrl && ctrl.Parent is Grid grd && grd.DataContext is Recipe recipe)
         {
             ((App)Application.Current).SelectedRecipe = null;
-            recipeService.DeleteRecipe(recipe.RecipeId, cancellationToken);
-            //titleControl.ChangeContent(new ViewRecipesControl();
+            parent.ChangeContent(new ViewRecipesControl(parent));
+
         }
     }
     #endregion
@@ -71,7 +70,7 @@ public partial class ViewRecipesControl : UserControl
         if (DataContext is ViewRecipesControlViewModel vm)
         {
             ((App)Application.Current).SelectedRecipe = vm.SelectedRecipe;
-            //titleControl.ChangeContent(new AddRecipeControl(recipeWindow, titleControl));
+            parent.ChangeContent(new AddRecipeControl(parent));
         }
     }
     #endregion
@@ -110,30 +109,18 @@ public partial class ViewRecipesControl : UserControl
         if (openFileDialog.ShowDialog() != true)
             return;
 
-        List<Recipe> skipped = [];
-        using StreamReader sr = new(openFileDialog.FileName);
-        var json = sr.ReadToEnd();
-        List<Recipe>? recipes = json.FromJson<List<Recipe>>();
-        foreach (Recipe recipe in recipes)
-            if (await recipeService.RecipeExists(recipe.Name, cancellationToken) == false)
-                await recipeService.AddRecipe(recipe.GetAddRecipeViewModel(), cancellationToken);
-            else
-                skipped.Add(recipe);
-        if (skipped.Any())
-        {
-            //show popup
-        }
+        await vm.ImportRecipes(openFileDialog.FileName, default);
+
         LoadData();
     }
     #endregion
     #endregion
 
-    public ViewRecipesControl()
+    public ViewRecipesControl(RecipesWithFunkWindow window)
     {
         InitializeComponent();
 
-        recipeService = new RecipeService();
-        DataContext = new ViewRecipesControlViewModel();
+        parent = window;
     }
 
     #region Events
@@ -179,7 +166,8 @@ public partial class ViewRecipesControl : UserControl
     {
         if (DataContext is ViewRecipesControlViewModel vm)
         {
-            vm.Recipes = [.. await recipeService.GetAllRecipes()];
+            await vm.PopulateRecipes();
+            await vm.PopulateTypes();
 
             PopulateRecipes();
         }
@@ -194,7 +182,7 @@ public partial class ViewRecipesControl : UserControl
             foreach (var type in vm.TypesSearch)
                 recipes = recipes.Where(w => vm.TypesSearch.Contains(w.Type));
 
-            foreach (var recipe in recipes)
+            foreach (var recipe in recipes.OrderBy(o => o.Name))
                 lvRecipes.Items.Add(recipe);
         }
     }

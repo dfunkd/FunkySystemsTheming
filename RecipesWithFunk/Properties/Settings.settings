@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="ServerName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">(LocalDB)\MSSQLLocalDB</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="InitialCatalog" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Inventory</Value>
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

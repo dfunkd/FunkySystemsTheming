@@ -2,6 +2,7 @@
 using RecipesWithFunk.Data.Services;
 using RecipesWithFunk.Model;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace RecipesWithFunk.ViewModels;
 
@@ -12,7 +13,6 @@ public class ViewRecipesControlViewModel : BaseViewModel
     public ViewRecipesControlViewModel()
     {
         service = new RecipeService();
-        _ = PopulateData();
     }
 
     private GroupFilter groupFilter = new();
@@ -113,8 +113,21 @@ public class ViewRecipesControlViewModel : BaseViewModel
         }
     }
 
-    private async Task PopulateData()
+    public async Task DeleteRecipe(int recipeId, CancellationToken cancellationToken)
+        => await service.DeleteRecipe(recipeId, cancellationToken);
+
+    public async Task ImportRecipes(string fileName, CancellationToken cancellationToken)
     {
-        Types = [.. await service.GetAllTypes(default)];
+        using StreamReader sr = new(fileName);
+        string json = sr.ReadToEnd();
+        foreach (Recipe recipe in json.FromJson<List<Recipe>>())
+            if (await service.RecipeExists(recipe.Name, cancellationToken) == false)
+                await service.AddRecipe(recipe.GetAddRecipeViewModel(), cancellationToken);
     }
+
+    public async Task PopulateTypes()
+        => Types = [.. await service.GetAllTypes(default)];
+
+    public async Task PopulateRecipes()
+        => Recipes = [.. await service.GetAllRecipes()];
 }

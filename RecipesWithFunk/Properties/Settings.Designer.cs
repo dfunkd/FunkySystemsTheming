@@ -25,7 +25,7 @@ namespace RecipesWithFunk.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("(LocalDB)\\MSSQLLocalDB")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ServerName {
             get {
                 return ((string)(this["ServerName"]));
@@ -37,7 +37,7 @@ namespace RecipesWithFunk.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Inventory")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string InitialCatalog {
             get {
                 return ((string)(this["InitialCatalog"]));

@@ -1,4 +1,5 @@
-﻿using RecipesWithFunk.UserControls;
+﻿using RecipesWithFunk.Properties;
+using RecipesWithFunk.UserControls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -17,6 +18,29 @@ public partial class RecipesWithFunkWindow : Window
     private void ExecutedCloseCommand(object sender, ExecutedRoutedEventArgs e)
         => Close();
     #endregion
+
+    #region Home Command
+    private static readonly RoutedCommand homeCommand = new();
+    public static RoutedCommand HomeCommand = homeCommand;
+    private void CanExecuteHomeCommand(object sender, CanExecuteRoutedEventArgs e)
+        => e.CanExecute = dpContent is not null && dpContent.Children.Count > 0 && (dpContent.Children[0] is ViewRecipesControl || dpContent.Children[0] is SplashControl);
+    private void ExecutedHomeCommand(object sender, ExecutedRoutedEventArgs e)
+        => ChangeContent(new SplashControl());
+    #endregion
+
+    #region View Command
+    private static readonly RoutedCommand viewCommand = new();
+    public static RoutedCommand ViewCommand = viewCommand;
+    private void CanExecuteViewCommand(object sender, CanExecuteRoutedEventArgs e)
+        => e.CanExecute = dpContent is not null && dpContent.Children.Count > 0 && (dpContent.Children[0] is ViewRecipesControl || dpContent.Children[0] is SplashControl);
+    private void ExecutedViewCommand(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (e.Source is ToggleButton tb && tb.IsChecked == true)
+            ChangeContent(new ViewRecipesControl(this));
+        else
+            ChangeContent(new SplashControl());
+    }
+    #endregion
     #endregion
 
     public RecipesWithFunkWindow()
@@ -33,6 +57,17 @@ public partial class RecipesWithFunkWindow : Window
 
     private void OnLoad(object sender, RoutedEventArgs e)
     {
+        if (string.IsNullOrEmpty(Settings.Default.ServerName) || string.IsNullOrEmpty(Settings.Default.InitialCatalog))
+        {
+            Visibility = Visibility.Collapsed;
+
+            DatabaseSettings settings = new();
+            if (settings.ShowDialog() == true)
+                Visibility = Visibility.Visible;
+            else
+                Close();
+        }
+
         ChangeContent(new SplashControl());
     }
 
@@ -55,19 +90,6 @@ public partial class RecipesWithFunkWindow : Window
                 tbHome.IsChecked = true;
                 val = "tbHome";
             }
-        }
-
-        switch (val)
-        {
-            case "tbHome":
-                ChangeContent(new SplashControl());
-                break;
-            case "tbView":
-                ChangeContent(new ViewRecipesControl());
-                break;
-            case "tbAdd":
-                ChangeContent(new AddRecipeControl());
-                break;
         }
     }
     #endregion

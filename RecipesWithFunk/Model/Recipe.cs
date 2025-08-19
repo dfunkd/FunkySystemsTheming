@@ -5,11 +5,11 @@ namespace RecipesWithFunk.Model;
 public class Recipe : BaseModel, ICloneable
 {
     public string? Description { get; set; }
-    public required string Directions { get; set; }
-    public required string Ingredients { get; set; }
-    public required string Name { get; set; }
+    public required string Directions { get; set; } = string.Empty;
+    public required string Ingredients { get; set; } = string.Empty;
+    public required string Name { get; set; } = string.Empty;
     public string? Note { get; set; }
-    public required string Type { get; set; }
+    public required string Type { get; set; } = string.Empty;
 
     public int Rating { get; set; }
     public int RecipeId { get; set; }
